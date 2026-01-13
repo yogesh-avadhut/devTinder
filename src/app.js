@@ -3,21 +3,27 @@ const app = express()
 const connectDb = require("./config/database")
 const UserModel = require("./models/user")
 
-app.post("/signup", async (req,res) => {
-    user = new UserModel({
-    fristName: "yogesh",
-    lastName: "avadht",
-    city: "barshi"
+app.use(express.json())
 
-    })
-    await user.save()
-    res.send("user added successful...")
+
+app.post("/signup", async (req, res) => {
+
+    const user = new UserModel(req.body)
+    try {
+        await user.save()
+        res.send({
+            message: "user successfully added :)",
+            user: req.body
+        })
+    }
+    catch (err) {
+        res.send({
+            message: "error come user are not created :(",
+            error: err.message
+        })
+
+    }
 })
-
-
-
-
-
 
 connectDb()
     .then(() => {
