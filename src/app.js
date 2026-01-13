@@ -1,18 +1,33 @@
 const express = require("express")
 const app = express()
+const connectDb = require("./config/database")
+const UserModel = require("./models/user")
 
-const {adminAuth,userAuth} =require("./middleware/auth")
+app.post("/signup", async (req,res) => {
+    user = new UserModel({
+    fristName: "yogesh",
+    lastName: "avadht",
+    city: "barshi"
 
-app.get("/admin",adminAuth,(req,res,next)=>{
-    res.send("welcome admin, have a good day..")
+    })
+    await user.save()
+    res.send("user added successful...")
 })
 
-app.get("/user",userAuth,(req,res,next)=>{
-    res.send("welcome user have a nice day ...")
-})
 
 
-app.listen(3000, () => {
-    console.log("server is running...")
-})
+
+
+
+connectDb()
+    .then(() => {
+        console.log("connection successful")
+        app.listen(3000, () => {
+            console.log("server is running...")
+        })
+
+    })
+    .catch((err) => {
+        console.log("error:", err)
+    })
 
