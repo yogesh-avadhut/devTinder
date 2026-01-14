@@ -38,12 +38,24 @@ app.get('/user', async (req, res) => {
     }
 })
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
     const data = req.body
-    const userId = req.body.userId
-
+    const userId = req.params.userId
+    console.log(data, userId)
     try {
-        const updateUser = await UserModel.findByIdAndUpdate(userId, data, { returnDocument: "before" })
+        const allowedFieldsToUpdate = ["firstName", "lastName", "gender", "age", "city", "photo"]
+        const isObjectAllowed = Object.keys(data).every((k) =>
+            allowedFieldsToUpdate.includes(k)
+        )
+
+
+
+
+        if (!isObjectAllowed) {
+            throw new Error("update not allowed ...")
+        }
+
+        const updateUser = await UserModel.findByIdAndUpdate(userId, data, { new: false, runValidators: true })
         console.log(updateUser)
         res.send({
             error: false,
@@ -53,7 +65,7 @@ app.patch("/user", async (req, res) => {
         })
     }
     catch (err) {
-        response.send({
+        res.send({
             error: true,
             message: ("update unsuccessful :(", err.message)
         })
