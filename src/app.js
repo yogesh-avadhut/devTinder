@@ -4,8 +4,12 @@ const connectDb = require("./config/database")
 const UserModel = require("./models/user")
 const { validateSignupData } = require("./utility/validation")
 const bcrypt = require("bcrypt")
+const cookieParser = require("cookie-parser")
+const jwt = require("jsonwebtoken")
+const { userAuth } = require("./middleware/auth")
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.post("/signup", async (req, res) => {
     try {
@@ -41,25 +45,26 @@ app.post("/signup", async (req, res) => {
     }
 })
 
-app.post("/login",async(req,res)=>{
-
-    try{
-        const {emailId,password} = req.body
-
-        const user = await UserModel.findOne({emailId:emailId})
-            if(!user){
-                throw new Error("Invalid creditionals !")
-            }
-        const isValidPassword = await bcrypt.compare(password,user.password)
-        
-        if(isValidPassword){
+app.post("/login", async (req, res) => {
+    try {
+        const { emailId, password } = req.body
+        const user = await UserModel.findOne({ emailId: emailId })
+        if (!user) {
+            throw new Error("Invalid creditionals !")
+        }
+        const isValidPassword = await bcrypt.compare(password, user.password)
+        if (isValidPassword) {
+            //create a jwt token 
+            const token = await jwt.sign({ _id: user._id }, "MySecret@1212")
+            //send the cookie
+            res.cookie("token", token)
             res.send("login successful ...")
-        }else{
+        } else {
             throw new Error("Invalid creditionals !")
         }
     }
-    catch(err){
-        res.status(400).send("error:"+err.message)
+    catch (err) {
+        res.status(400).send("error:" + err.message)
     }
 })
 
@@ -143,6 +148,22 @@ app.delete("/user", async (req, res) => {
             message: err.message
         })
     }
+})
+
+app.get("/profile", userAuth, async (req, res) => {
+    try {
+        res.send({
+            error: false,
+            data: req.user
+        })
+    }
+    catch (err) {
+        res.send({
+            error: true,
+            message: err.message
+        })
+    }
+
 })
 
 connectDb()

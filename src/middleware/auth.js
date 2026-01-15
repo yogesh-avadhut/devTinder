@@ -1,26 +1,26 @@
+const jwt = require("jsonwebtoken")
+const UserModel = require("../models/user")
 
-function adminAuth(req,res,next){
-    const token = "abc"
-    const isAuthrosiedAdmin = token ==="abc"
-
-    if(!isAuthrosiedAdmin){
-        res.status(401).send("you are not authorised admin ....")
-    }
-    else{
+async function userAuth(req, res, next) {
+    try {
+        //read cookies
+        const { token } = req.cookies
+        //auth token 
+        const decodingObj = await jwt.verify(token, "MySecret@1212")
+        const _id = decodingObj._id
+        //search user 
+        const user = await UserModel.findById(_id)
+        if (!user) {
+            throw new Error("user not found ...")
+        }
+        req.user = user
         next()
     }
-}
-
-function userAuth(req,res,next){
-    const token = "xyz"
-    const isAuthrosiedUser = token ==="xyz"
-
-    if(!isAuthrosiedUser){
-        res.status(401).send("you are not valid user ....")
-    }
-    else{
-        next()
+    catch (err) {
+        res.send({
+            error: true,
+            message: err.message
+        })
     }
 }
-
-module.exports = {adminAuth,userAuth}
+module.exports = { userAuth }
