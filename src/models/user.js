@@ -18,13 +18,9 @@ const userSchema = new mongoose.Schema(
     maxlength: 30
   },
 
-  email: {
+  emailId: {
     type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    required: true
   },
 
   mobile: {
@@ -34,7 +30,6 @@ const userSchema = new mongoose.Schema(
 
   gender: {
     type: String,
-    required: true,
     enum: ["male", "female", "other"]
   },
 
@@ -51,7 +46,11 @@ const userSchema = new mongoose.Schema(
 
   photo: {
     type: String
-  }
+  },
+      password: {
+      type: String,
+      required: true
+    }
 },
 {
   timestamps: true
