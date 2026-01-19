@@ -9,11 +9,12 @@ authRouter.post("/signup", async (req, res) => {
     try {
         //validation before creating user 
         validateSignupData(req)
+
         const { firstName, lastName, emailId, password } = req.body
         console.log(firstName, lastName, emailId, password)
         //password hashing/encrypting
         const passwordHash = await bcrypt.hash(password, 10)
-        // console.log(passwordHash)
+        console.log(passwordHash)
 
         //creating new record
         const createUser = new UserModel({
@@ -22,7 +23,7 @@ authRouter.post("/signup", async (req, res) => {
             emailId,
             password: passwordHash
         })
-        // console.log(createUser)
+        console.log(createUser)
 
         await createUser.save()
         res.send({
