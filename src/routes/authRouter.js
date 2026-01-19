@@ -9,12 +9,11 @@ authRouter.post("/signup", async (req, res) => {
     try {
         //validation before creating user 
         validateSignupData(req)
-
         const { firstName, lastName, emailId, password } = req.body
         console.log(firstName, lastName, emailId, password)
         //password hashing/encrypting
         const passwordHash = await bcrypt.hash(password, 10)
-        console.log(passwordHash)
+        // console.log(passwordHash)
 
         //creating new record
         const createUser = new UserModel({
@@ -23,7 +22,7 @@ authRouter.post("/signup", async (req, res) => {
             emailId,
             password: passwordHash
         })
-        console.log(createUser)
+        // console.log(createUser)
 
         await createUser.save()
         res.send({
@@ -62,5 +61,18 @@ authRouter.post("/login", async (req, res) => {
     }
 })
 
+
+authRouter.post('/logout', (req, res) => {
+    try {
+        res.cookie("token", null, { expires: new Date(Date.now()) })
+        res.send({
+            error: false,
+            message: "logout success "
+        })
+    }
+    catch (err) {
+        res.status(400).send("error:" + err.message)
+    }
+})
 
 module.exports = authRouter;
