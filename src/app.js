@@ -5,7 +5,7 @@ const UserModel = require("./models/user")
 const cookieParser = require("cookie-parser")
 const authRouter = require("./routes/authRouter")
 const { profileRouter } = require("./routes/profileRouter")
-const { connectRequestRouter } = require("./routes/connectionRequestouter")
+const { requestRouter } = require("./routes/connectionRequestouter")
 
 
 app.use(express.json())
@@ -13,7 +13,7 @@ app.use(cookieParser())
 
 app.use('/',authRouter)
 app.use('/',profileRouter)
-app.use('/',connectRequestRouter)
+app.use('/',requestRouter)
 
 
 app.get('/user', async (req, res) => {
@@ -52,7 +52,6 @@ app.patch("/user/:userId", async (req, res) => {
         if (!isObjectAllowed) {
             throw new Error("update not allowed ...")
         }
-
         const updateUser = await UserModel.findByIdAndUpdate(userId, data, { new: false, runValidators: true })
         console.log(updateUser)
         res.send({
@@ -89,7 +88,6 @@ app.delete("/user", async (req, res) => {
             })
         }
     }
-
     catch (err) {
         res.status(500).send({
             error: true,
@@ -104,7 +102,6 @@ connectDb()
         app.listen(3000, () => {
             console.log("server is running...")
         })
-
     })
     .catch((err) => {
         console.log("error:", err)
